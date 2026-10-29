@@ -89,3 +89,53 @@
   value and not a missing one.
 - The difference between where a file is created in the Explorer and what
   path I type when I name it.
+
+  ## Day 4: Oct 29, 2026
+
+### What I did
+- Wrote src/eda.py with a churn distribution plot and box plots of tenure,
+  MonthlyCharges and TotalCharges split by churn.
+- Wrote src/eda_categorical.py to calculate and plot the churn rate for
+  Contract, InternetService, PaymentMethod and TechSupport.
+- Saved all plots in reports/figures/ so they can go in the README later.
+
+### What I found
+- 73.5% of customers stayed and 26.5% churned, so the classes are imbalanced.
+  A model that always predicts "stayed" would be about 73.5% accurate and
+  still catch zero churners.
+- Churners have a much lower tenure (about 18 months vs about 37 for customers
+  who stayed) and pay more per month (about 74 vs about 61).
+- TotalCharges is lower for churners because they leave early and have had
+  fewer months to add up charges. It mostly reflects tenure.
+- Month-to-month contracts churn at about 43%, compared with about 11% for
+  one-year and about 3% for two-year contracts.
+- Fiber optic customers churn the most (about 42%), versus about 19% for DSL
+  and about 7% for no internet.
+- Electronic check payers churn the most (about 45%), while the other payment
+  methods are around 15-19%.
+- Customers without tech support churn at about 42%, versus about 15% for
+  those with it.
+
+### 5 insights for the project
+1. Customers are most at risk early in their time with the company.
+2. Month-to-month contracts are the biggest churn risk.
+3. Fiber optic customers pay more and churn more, so price or service quality
+   may be an issue (a question to investigate, not a conclusion).
+4. Tech support is linked to much lower churn.
+5. Accuracy alone is a bad metric here, so I will use precision, recall and F1.
+
+### What I learned
+- A box plot shows the middle 50% of values as a box, with the median as the
+  line inside it, which makes two groups easy to compare.
+- Because Churn is stored as 0 and 1, the mean of a group is its churn rate.
+  This is why df.groupby(col)["Churn"].mean() works.
+- Correlation is not causation. Electronic check payers churn more, but that
+  does not mean the payment method causes churn. Other factors, like contract
+  type, may be behind it.
+- Putting plotting code inside functions lets me reuse it and add more plots
+  without rewriting the file.
+
+### Mistakes / what confused me
+- (Write anything that went wrong today, for example a pasted command that
+  failed or a file in the wrong place. If nothing went wrong, write what you
+  found hardest to understand.)
