@@ -139,3 +139,43 @@
 - (Write anything that went wrong today, for example a pasted command that
   failed or a file in the wrong place. If nothing went wrong, write what you
   found hardest to understand.)
+
+  ## Day 5: Oct 30, 2026
+
+### What I did
+- Wrote src/preprocess.py to prepare the data for a model.
+- Separated the features (X) from the target (y = Churn).
+- One-hot encoded all 15 text columns with pd.get_dummies(drop_first=True),
+  which took the feature count from 19 to 30.
+- Installed scikit-learn and split the data 80/20 into training and test sets
+  with train_test_split (random_state=42, stratify=y).
+- Updated requirements.txt with scikit-learn.
+
+### What I found
+- X has shape (7043, 30), with no text columns and no missing values left.
+- Train has 5,634 customers and test has 1,409.
+- The churn rate is 26.5% overall, in train, and in test, so the split kept
+  the class balance.
+
+### What I learned
+- Models only work with numbers, so text columns must be converted first.
+- Mapping Contract to 0, 1, 2 would wrongly tell the model that Two year is
+  "twice" One year. One-hot encoding gives each category its own 0/1 column,
+  so no false order is created.
+- drop_first=True removes one column per category, since it can be worked out
+  from the others and keeping it only adds redundant information.
+- X is what the model learns from, and y is the answer it should predict.
+  They are separated so the model never sees the answer as an input.
+- A test set is a fair exam. If I tested on the training data, the model could
+  memorize the answers and look perfect without really learning.
+- stratify=y keeps the churn rate the same in train and test, which matters
+  because only about a quarter of customers churn.
+- random_state fixes the shuffle so my results are repeatable.
+
+### Mistakes / what confused me
+- (Write anything that went wrong today, such as a failed pip install or a
+  file in the wrong place. If nothing did, write the idea you found hardest.)
+
+### Next
+- Day 6: train a baseline logistic regression model and evaluate it on the
+  test set.
