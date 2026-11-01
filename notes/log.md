@@ -179,3 +179,114 @@
 ### Next
 - Day 6: train a baseline logistic regression model and evaluate it on the
   test set.
+
+  ## Day 6: Oct 31, 2026
+
+### What I did
+- Wrote src/train_baseline.py: scaled the numeric columns (tenure,
+  MonthlyCharges, TotalCharges) with StandardScaler, trained a logistic
+  regression, and evaluated it on the test set.
+- Wrote src/evaluate_baseline.py: saved a confusion matrix plot and a table
+  showing how precision and recall change with the decision threshold.
+- Reused functions from earlier days (encode_features, split_data,
+  scale_numeric) instead of copying code.
+
+### Baseline results (test set, threshold 0.5)
+- Accuracy about 0.80-0.82, precision about 0.65, recall about 0.55,
+  F1 about 0.60, ROC-AUC about 0.84.
+- Compared with always predicting "stayed" (73.5% accuracy), the model is only
+  about 7 points better in accuracy, and it still misses almost half of the
+  customers who churn.
+
+### What I found
+- The model correctly identifies most customers who stay, but misses roughly
+  45% of churners (the false negatives in the bottom-left of the confusion
+  matrix).
+- Lowering the threshold from 0.5 to 0.3 raises recall a lot but lowers
+  precision, and flags many more customers.
+
+### What I learned
+- The scaler is fitted on the training data only and then applied to the test
+  data. Fitting it on everything would leak information from the test set.
+- Logistic regression outputs a probability of churn. The 0.5 threshold that
+  turns it into a yes/no prediction is a choice, not a rule.
+- Precision = of the customers I flagged, how many really churned.
+  Recall = of the customers who really churned, how many I caught.
+- A false negative (a missed churner) and a false positive (a false alarm)
+  have different business costs. If the retention action is a free email,
+  a low threshold with high recall makes sense. If it is an expensive
+  discount, precision matters more.
+- Accuracy alone is misleading on imbalanced data. I will judge models with
+  recall, precision, F1 and ROC-AUC.
+- Importing a function does not run the script's main code, because that code
+  sits under if __name__ == "__main__".
+
+### Mistakes / what confused me
+- (Write anything that went wrong today, such as a failed command or a file in
+  the wrong place. If nothing did, write the idea you found hardest, for
+  example the difference between precision and recall.)
+
+### Next
+- Day 7: train a Random Forest and compare it with the baseline.
+
+## Day 7: Nov 1, 2026
+
+### What I did
+- Wrote src/compare_models.py to train and compare three models on the same
+  test set: logistic regression, a random forest, and a random forest with
+  class_weight="balanced".
+- Wrote src/feature_importance.py to rank the features by how much the random
+  forest relied on them, and saved a bar chart in reports/figures/.
+- Reused functions from earlier days (encode_features, split_data,
+  scale_numeric) instead of copying code.
+
+### Model comparison (test set, threshold 0.5)
+- Logistic regression: accuracy about 0.80-0.82, recall about 0.55,
+  ROC-AUC about 0.84.
+- Random forest: accuracy about 0.78-0.80, recall about 0.45-0.50,
+  ROC-AUC about 0.82.
+- Random forest (balanced): similar to the plain forest, with slightly higher
+  recall.
+- The more complex model did not beat the simple baseline. On clean tabular
+  data with mostly straightforward relationships, logistic regression can be
+  very hard to beat, and a forest with default settings can overfit the
+  training data.
+
+### Feature importance
+- Top features were TotalCharges, tenure and MonthlyCharges, followed by
+  Contract_Two year, InternetService_Fiber optic and
+  PaymentMethod_Electronic check.
+- This agrees with my Day 4 findings: customers are most at risk early on,
+  on month-to-month contracts, with fiber optic, and paying by electronic
+  check.
+
+### What I learned
+- A random forest is many decision trees trained on random slices of the data
+  that vote on the answer. It does not need scaled numbers, but logistic
+  regression does.
+- A more complex model is not automatically a better one. Always compare
+  against a simple baseline.
+- class_weight="balanced" makes the model pay more attention to the rarer
+  class (churners), so it flags more of them. This raises recall, usually at
+  the cost of precision.
+- feature_importances_ shows what the model relied on, not what causes
+  churn. This is the same correlation vs causation lesson from Day 4.
+- Forest importance tends to favour numeric columns with many different
+  values, so TotalCharges and MonthlyCharges may look more important than
+  they really are. TotalCharges also mostly reflects tenure.
+- Putting scoring code in one function (score) lets me compare many models
+  in one table without repeating code.
+
+### Mistakes / what confused me
+- (Write anything that went wrong today, for example forgetting to activate
+  .venv, a pasted command that failed, or a stray file. If nothing did, write
+  the idea you found hardest, such as why the forest did not win.)
+
+### Week 1 summary
+- In 7 days I went from an empty repo to a cleaned dataset, EDA plots,
+  encoded features, a baseline model, an evaluation with a threshold trade-off,
+  a model comparison and a feature importance chart, with a commit every day.
+
+### Next
+- Day 8: use cross-validation for a more reliable comparison, and tune the
+  hyperparameters of the best model.
