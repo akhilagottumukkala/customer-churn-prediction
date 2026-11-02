@@ -290,3 +290,53 @@
 ### Next
 - Day 8: use cross-validation for a more reliable comparison, and tune the
   hyperparameters of the best model.
+
+  ## Day 8: Nov 2, 2026
+
+### What I did
+- Wrote src/cross_validate.py: 5-fold stratified cross-validation of three
+  models, with the scaler inside a Pipeline so it is refitted on each fold.
+- Wrote src/tune_models.py: grid search (5-fold CV, scored by ROC-AUC) for
+  logistic regression (C) and a balanced random forest (max_depth,
+  min_samples_leaf), then one final check on the untouched test set.
+
+### Cross-validation results (training set, mean +/- std)
+- Logistic regression: ROC-AUC 0.846 +/- 0.013, recall 0.544, precision 0.655.
+- Random forest: ROC-AUC 0.826, recall 0.472, precision 0.636.
+- Random forest (balanced): ROC-AUC 0.827, recall 0.648, precision 0.577,
+  best F1 (0.610). class_weight="balanced" did not improve ranking (same AUC);
+  it made the model flag more customers, raising recall and lowering precision.
+
+### Tuning results
+- Logistic regression: best C = 10, CV ROC-AUC 0.846 (no real gain).
+- Balanced forest: best max_depth = 8, min_samples_leaf = 5, CV ROC-AUC 0.848
+  (up from 0.827 untuned), so limiting tree depth reduced overfitting.
+- Final test set: tuned logistic regression ROC-AUC 0.841, recall 0.559,
+  precision 0.657, F1 0.604. Tuned balanced forest ROC-AUC 0.844, recall
+  0.805, precision 0.524, F1 0.635.
+
+### What I found
+- On ROC-AUC the two tuned models are effectively tied (difference 0.003,
+  smaller than the fold-to-fold spread of about 0.012).
+- They differ in operating point: the forest catches about 80% of churners
+  but about half of its flags are false alarms; logistic regression catches
+  about 56% with fewer false alarms.
+
+### What I learned
+- Cross-validation gives a more trustworthy score than one split, and the
+  +/- shows how stable the result is.
+- A Pipeline keeps preprocessing inside each fold and avoids data leakage.
+- Hyperparameters are settings chosen before training. A grid search tries
+  every combination and scores each with cross-validation.
+- The test set is used only once at the end, so it stays a fair exam.
+- Limiting tree depth and leaf size makes a random forest overfit less.
+- Higher recall from class_weight or a lower threshold has a cost in
+  precision. The right choice depends on the business cost of a missed
+  churner vs a false alarm.
+
+### Mistakes / what confused me
+- (Write anything that went wrong today, or the idea you found hardest, such
+  as why the pipeline matters or how the grid search works.)
+
+### Next
+- Day 9: save the best model to a file and load it to make predictions.
