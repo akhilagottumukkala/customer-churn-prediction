@@ -340,3 +340,51 @@
 
 ### Next
 - Day 9: save the best model to a file and load it to make predictions.
+
+## Day 9: Nov 3, 2026
+
+### What I did
+- Wrote src/save_model.py: trained the final tuned balanced random forest
+  (max_depth=8, min_samples_leaf=5, class_weight="balanced") and saved it with
+  joblib to models/churn_model.joblib.
+- Saved the 30 feature column names, in order, to models/feature_columns.json.
+- Wrote src/predict.py: loads the saved model, turns one raw customer (a
+  dictionary) into the 30 columns the model expects, and returns a churn
+  probability and a yes/no prediction.
+- Tested it on two made-up customers, one high-risk and one low-risk.
+
+### Results
+- Sanity check after training: test ROC-AUC 0.844 and recall 0.805, matching
+  the Day 8 final table, so the saved model is the right one.
+- High-risk customer (new, month-to-month, fiber optic, electronic check, no
+  tech support): churn probability well above 0.5, predicted to churn.
+- Low-risk customer (60 months, two-year contract, DSL, tech support,
+  automatic payment): churn probability well below 0.5, predicted to stay.
+- Both predictions agree with my Day 4 findings.
+
+### What I learned
+- A trained model only exists in memory while a script runs. joblib.dump
+  saves it to a file so it can be loaded later without retraining.
+- The model needs the exact same columns in the exact same order as in
+  training, so I saved the column names as well as the model.
+- reindex(columns=feature_columns, fill_value=0) gives a new customer all 30
+  columns. Categories the customer does not have become 0, and the "first
+  category" columns dropped by drop_first=True are not needed, since a
+  customer in that category simply has 0 in all the other columns.
+- Random forests do not need scaling, so there was no scaler to save. A model
+  that does use a scaler would need the fitted scaler saved too.
+- A saved model file depends on the scikit-learn version it was made with, so
+  requirements.txt matters. Only load model files from sources I trust,
+  because joblib files can run code when loaded.
+- Putting the prediction logic in functions (load_artifacts, prepare_input,
+  predict_churn) means the API on the next days can reuse them directly.
+- Printing a sanity check (the same metrics as before) after training is a
+  cheap way to catch saving the wrong model.
+
+### Mistakes / what confused me
+- (Write anything that went wrong today, such as a wrong folder, a typo in a
+  column value, or a pasted command that failed. If nothing did, write the
+  idea you found hardest, such as why the column order matters.)
+
+### Next
+- Day 10: wrap predict_churn in a FastAPI endpoint and test it in the browser.
