@@ -388,3 +388,55 @@
 
 ### Next
 - Day 10: wrap predict_churn in a FastAPI endpoint and test it in the browser.
+
+## Day 10: Nov 4, 2026
+
+### What I did
+- Installed fastapi and uvicorn (the first attempt failed because my internet
+  connection could not resolve pypi.org; it worked once the connection was back).
+- Wrote src/api.py: a FastAPI service with GET /health and POST /predict.
+- Described a valid customer with a Pydantic model (Customer), using Literal
+  for fixed choices and Field limits for numbers, so bad input is rejected
+  before it reaches the model.
+- Reused load_artifacts and predict_churn from predict.py, so the API has no
+  model logic of its own, and loaded the model once at startup.
+- Tried the API in the browser at /health and /docs.
+- Wrote tests/test_api.py with 6 pytest tests and added pytest.ini so tests
+  can import from src.
+
+### Results
+- /health returned {"status": "ok"}.
+- The pre-filled high-risk customer returned a churn probability of 0.863 with
+  will_churn true.
+- Changing the customer to a two-year contract with 60 months of tenure gave a
+  much lower probability.
+- pytest: 6 passed (health, valid probability, high risk above low risk,
+  invalid contract rejected, negative tenure rejected, missing field rejected).
+
+### What I learned
+- An API lets one program ask another for something over the web. FastAPI
+  turns a Python function into an endpoint, and uvicorn is the server that runs it.
+- GET asks for information and POST sends data to be processed.
+- Pydantic validates input automatically. A misspelled value returns status
+  422 ("unprocessable") with a clear message instead of crashing the model.
+- Loading the model once at startup is much faster than loading it on every
+  request.
+- FastAPI builds interactive documentation at /docs for free, which makes
+  manual testing easy.
+- A manual click proves the API works today, and an automated test proves it
+  keeps working after changes. A test that checks will_churn agrees with the
+  probability would catch the kind of contradiction I saw earlier.
+- A failed pip install with "Failed to resolve pypi.org" means a network or
+  DNS problem, not a problem with my code.
+
+### Mistakes / what confused me
+- pip could not reach pypi.org, so the install failed. It was my internet
+  connection, not the command.
+- At one point /predict returned a probability of 0 with will_churn true,
+  which the code should not be able to produce. When I re-ran the unchanged
+  example I got 0.863 and true, so the cause was probably a stray edit in the
+  request body. I added a test so a mismatch would be caught automatically.
+- (Add anything else that went wrong today, or the idea you found hardest.)
+
+### Next
+- Day 11: write a Dockerfile, build an image, and run the API in a container.
