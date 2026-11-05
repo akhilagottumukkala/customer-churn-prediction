@@ -440,3 +440,20 @@
 
 ### Next
 - Day 11: write a Dockerfile, build an image, and run the API in a container.
+## Day 11: Nov 5, 2026
+
+### What I did
+- Wrote a Dockerfile, a .dockerignore, and requirements-api.txt (only the
+  libraries the API needs, with exact versions) to package the API.
+- Have not installed Docker Desktop or built the image yet. That is for Day 12.
+
+### What I learned
+- A Dockerfile is a recipe: image = the recipe's result, container = a running
+  image.
+- Install libraries before copying code so Docker can cache the slow step.
+- --host 0.0.0.0 is needed so the API is reachable from outside the container.
+- The scikit-learn version in the image must match the one that saved the
+  model, so the versions are pinned.
+
+### Next
+- Day 12: install Docker Desktop, build the image, run the container and test it.
